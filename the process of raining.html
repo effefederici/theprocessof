@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>t h e p r o c e s s o f r a i n i n g</title>
+<style>
+  body {
+    margin: 0;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  #container {
+    width: 700px;
+    height: 700px;
+    border: 1px solid #000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .word {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 14px;
+    cursor: default;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+const text = `
+rains il pleut llueve es regnet chove het regent det regnar det regner det regner sataa идет дождь йде дощ pada deszcz prší prší esik plouă βρέχει yağmur yağıyor تمطر יורד גשם 下雨 雨が降る 비가 온다 बारिश हो रही है বৃষ্টি হচ্ছে மழை பெய்கிறது ฝนตก hujan turun mvua inanyesha piove pluit pluunt pluere pluit pluit plu pluuv plod pluu regn pluia
+`;
+
+const container = document.getElementById("container");
+const words = text.replace(/\n/g, " ").split(/\s+/);
+
+const cols = 10;
+const rows = 10;
+const cellW = 700 / cols;
+const cellH = 700 / rows;
+
+let grid = [];
+let elements = [];
+
+for (let i = 0; i < words.length; i++) {
+  const span = document.createElement("span");
+  span.className = "word";
+  span.textContent = words[i];
+
+  const col = i % cols;
+  const row = Math.floor(i / cols);
+
+  span.style.left = col * cellW + Math.random() * 10 + "px";
+  span.style.top = -Math.random() * 700 + "px";
+
+  const speed = 0.3 + Math.random() * 0.7;
+
+  span.dataset.col = col;
+  span.dataset.row = row;
+  span.dataset.speed = speed;
+
+  container.appendChild(span);
+
+  elements.push(span);
+  grid.push(span);
+
+  span.addEventListener("mouseenter", () => swapWithNeighbor(span));
+}
+
+function swapWithNeighbor(el) {
+  const col = parseInt(el.dataset.col);
+  const row = parseInt(el.dataset.row);
+
+  const neighbors = [
+    {c: col - 1, r: row},
+    {c: col + 1, r: row},
+    {c: col, r: row - 1},
+    {c: col, r: row + 1}
+  ].filter(n => n.c >= 0 && n.c < cols && n.r >= 0 && n.r < rows);
+
+  if (neighbors.length === 0) return;
+
+  const n = neighbors[Math.floor(Math.random() * neighbors.length)];
+  const idx = n.r * cols + n.c;
+  const other = grid[idx];
+
+  if (!other) return;
+
+  const temp = el.textContent;
+  el.textContent = other.textContent;
+  other.textContent = temp;
+}
+
+function animate() {
+  elements.forEach(el => {
+    let top = parseFloat(el.style.top);
+    top += parseFloat(el.dataset.speed);
+
+    if (top > 700) {
+      top = -20;
+    }
+    el.style.top = top + "px";
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
+
