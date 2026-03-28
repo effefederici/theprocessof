@@ -28,6 +28,7 @@
     font-size: 14px;
     cursor: default;
     user-select: none;
+    touch-action: none; /* prevenire scroll su touch */
   }
 </style>
 </head>
@@ -73,7 +74,14 @@ for (let i = 0; i < words.length; i++) {
   elements.push(span);
   grid.push(span);
 
+  // Desktop: scambio al mouse
   span.addEventListener("mouseenter", () => swapWithNeighbor(span));
+
+  // Tablet/iPad: scambio al tocco
+  span.addEventListener("touchstart", e => {
+    e.preventDefault(); // prevenire scroll
+    swapWithNeighbor(span);
+  }, {passive:false});
 }
 
 function swapWithNeighbor(el) {
@@ -114,9 +122,9 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+// Avvio animazione verticale indipendente da dispositivo
 animate();
 </script>
 
 </body>
 </html>
-
